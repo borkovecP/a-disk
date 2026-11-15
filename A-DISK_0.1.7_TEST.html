@@ -1,0 +1,223 @@
+<!doctype html><html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="referrer" content="strict-origin-when-cross-origin"><meta name="theme-color" content="#c41621"><meta name="apple-mobile-web-app-capable" content="yes"><title>A-DISK · 0.1.7 TEST</title><style>
+    :root{--red:#c41621;--red-deep:#9d101b;--ink:#303238;--line:#dddfe3}
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;color:var(--ink)}
+    body{background:#f2f3f5;overflow-x:hidden}
+    .shell{min-height:100svh;background:#f4f5f7}
+    .shell:before,.shell:after{display:none}
+    .header{height:60px;display:flex;align-items:center;gap:17px;padding:0 clamp(16px,2.8vw,38px);color:white;background:#c41621;border-bottom:1px solid #a40f19;box-shadow:0 2px 5px #0002;position:sticky;top:0;z-index:2}
+    .menu-button{appearance:none;border:0;background:transparent;color:inherit;padding:7px 12px 7px 0;cursor:pointer;display:grid;place-items:center;border-right:1px solid #ffffff55;min-width:39px;height:37px}
+    .menu-button svg{height:24px;width:24px;stroke-width:2.2}
+    .brand{font-size:24px;font-weight:750;letter-spacing:-.6px;white-space:nowrap;line-height:1}
+    .brand span{color:white}
+    .logo{margin-left:auto;display:flex;flex-direction:column;align-items:center;color:#fff;font-style:italic;font-size:22px;letter-spacing:-1px;font-weight:600;line-height:.9}
+    .logo:before,.logo:after{content:"";width:88%;height:2px;background:white;transform:skewY(-7deg);margin-bottom:4px}.logo:after{margin:4px 0 0;transform:skewY(6deg)}
+    .tilesPage{max-width:1160px;margin:0 auto;padding:38px 25px 65px}
+    .tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:17px;align-items:stretch}
+    .tile{display:flex;align-items:center;flex-direction:column;min-width:0;min-height:148px;justify-content:center;padding:19px 10px 15px;border:1px solid #d9dce1;border-radius:13px;background:#fff;box-shadow:0 2px 6px #00000012;color:#333;text-align:center;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;position:relative;overflow:hidden}
+    .tile:before{content:"";position:absolute;top:0;left:0;right:0;height:5px;background:var(--red)}
+    .tile:hover,.tile:focus-visible{transform:translateY(-2px);box-shadow:0 6px 16px #0002;border-color:#bbbec4;outline:2px solid #c41621;outline-offset:2px}
+    .tile-icon{height:67px;width:100%;display:grid;place-items:center;padding:0}
+    .tile-icon svg{width:54px;height:54px;stroke:#bd1823;fill:none;stroke-linejoin:round;stroke-linecap:round;stroke-width:2.25}
+    .tile-name{height:auto;min-height:35px;width:100%;background:none;clip-path:none;display:flex;align-items:center;justify-content:center;padding:5px 2px 0;font-size:17px;line-height:1.16;font-weight:700;text-shadow:none;color:#333}
+    .tile-icon rect[fill]{fill:#c41621}
+    .overlay{position:fixed;inset:0;background:#0008;display:none;z-index:4}.overlay.active{display:block}
+    .drawer{position:fixed;z-index:5;top:0;bottom:0;left:0;width:min(340px,88vw);background:#fafbfc;transform:translateX(-102%);transition:transform .2s ease;box-shadow:5px 0 20px #0002;padding:22px}
+    .drawer.active{transform:translateX(0)}.drawer h2{margin:12px 0 20px}.drawer button{width:100%;border:0;background:#fff;border-bottom:1px solid #ddd;text-align:left;padding:16px 12px;font:inherit;cursor:pointer}.drawer button:hover{background:#f7e5e7}
+    .version{font-size:12px;color:#777;position:absolute;bottom:24px}
+    dialog{border:0;border-radius:14px;box-shadow:0 24px 80px #0006;padding:0;width:min(460px,calc(100vw - 32px));max-height:90vh;color:#25272d}dialog::backdrop{background:#0008}
+    .dialog-header{padding:17px 22px;background:#c41621;color:white;font-size:20px;font-weight:700}.dialog-body{padding:22px 24px;font-size:16px;line-height:1.5}.dialog-body p{margin:0 0 16px}.dialog-actions{display:flex;justify-content:flex-end;gap:10px;padding:0 24px 22px}.btn{border:0;border-radius:8px;padding:12px 18px;background:#c41621;color:#fff;font:inherit;cursor:pointer}.btn.secondary{background:#e9ebef;color:#25272d}
+    .note{font-size:12px;color:#85878b;margin-top:27px;text-align:left}
+    @media(max-width:970px){.tiles{grid-template-columns:repeat(4,minmax(0,1fr))}}
+    @media(max-width:720px){.tilesPage{padding:25px 16px 55px}.tiles{grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.tile{min-height:126px;padding:14px 7px 9px}.tile-icon{height:55px}.tile-icon svg{width:44px;height:44px}.tile-name{font-size:15px}.header{height:54px;padding:0 14px}.brand{font-size:22px}.logo{font-size:19px}}
+    @media(max-width:440px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.tile{min-height:125px}.note{text-align:center}}
+    @media(prefers-reduced-motion:reduce){.tile,.drawer{transition:none}}
+  
+    .header .homeBtn{color:white;background:#ffffff17;border:1px solid #ffffff7a;border-radius:7px;padding:7px 11px;font-weight:700;cursor:pointer;font-size:14px;display:none}
+    .header .homeBtn.visible{display:block}
+    .header .versionTiny{font-size:12px;font-weight:600;opacity:.86;margin-left:4px;white-space:nowrap}
+    .tilesPage{max-width:1160px;margin:0 auto;padding:38px 25px 65px}
+    #browserPage{display:none;min-height:calc(100svh - 60px);padding:16px clamp(10px,1.7vw,24px) 24px}
+    .browserTop{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+    .browserTop h1{font-size:20px;margin:0;line-height:1.2}
+    .browserTop p{font-size:12px;color:#6b6d72;margin:0}
+    .browserActions{margin-left:auto;display:flex;gap:8px;align-items:center}
+    .softBtn,.actionBtn{border:1px solid #d5d8df;background:#fff;border-radius:7px;padding:9px 12px;font:inherit;font-size:13px;cursor:pointer;color:#25272d}
+    .actionBtn{background:var(--red);color:#fff;border-color:var(--red)}
+    .softBtn:disabled{opacity:.4;cursor:default}
+    .columns{display:flex;align-items:stretch;gap:0;height:calc(100svh - 155px);min-height:390px;background:#fff;border:1px solid #d9dce1;border-radius:11px;overflow:hidden;box-shadow:0 2px 9px #00000010}
+    .columnStrip{display:flex;min-width:0;flex:0 0 min(calc(var(--count,1) * var(--col-width,260px)),calc(100% - 360px));overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;background:#fff;scrollbar-width:thin}
+    .folderCol{flex:0 0 clamp(205px,21vw,260px);width:clamp(205px,21vw,260px);min-width:0;min-height:100%;border-right:1px solid #dde0e5;display:flex;flex-direction:column;scroll-snap-align:start}
+    .colHead{padding:13px 12px;background:#f4f5f7;border-bottom:1px solid #dce0e5;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .colItems{padding:5px 0;overflow:auto;flex:1}
+    .entry{display:flex;align-items:center;gap:7px;width:100%;text-align:left;min-height:38px;background:transparent;color:#292b30;border:0;border-radius:0;padding:8px 10px;font-size:13px;cursor:pointer}
+    .entry:hover{background:#f5f0f0}.entry.selected{background:#fbe8ea;color:#8d0f1a;font-weight:700}
+    .entryIcon{font-size:16px;flex:0 0 22px;text-align:center}
+    .entryName{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.entryChevron{color:#8f949c}
+    .preview{flex:1;min-width:0;display:flex;flex-direction:column;background:#f6f7f9}
+    .previewHead{background:white;border-bottom:1px solid #dce0e5;padding:12px 14px;display:flex;gap:12px;align-items:center;min-height:51px}
+    .previewTitle{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+    .previewTools{display:flex;gap:6px;flex-wrap:wrap}
+    .previewMain{min-height:0;flex:1;display:flex;align-items:stretch;justify-content:center;overflow:auto}
+    #previewFrame{width:100%;height:100%;border:0;background:white;display:none}
+    #previewImage{display:none;max-width:100%;max-height:100%;object-fit:contain;margin:auto}
+    #previewEmpty{align-self:center;padding:25px;text-align:center;color:#777;font-size:14px;line-height:1.5}
+    .stateBar{font-size:12px;color:#6b6d72;margin-top:9px;min-height:18px;overflow-wrap:anywhere}
+    .error{color:#a01421;font-weight:600}
+    .hidden{display:none!important}
+    #setup{display:none;background:#fff;border:1px solid #dedfe4;border-radius:10px;margin-bottom:12px;padding:14px;box-shadow:0 2px 6px #0001}
+    #setup.show{display:block}
+    #setup label{font-size:14px;font-weight:700;display:block;margin-bottom:8px}
+    #setup input{padding:10px 12px;border:1px solid #bfc4cc;border-radius:7px;min-width:min(100%,390px);font:inherit}
+    #setup .help{font-size:12px;color:#777;margin:7px 0 0;line-height:1.4}
+    .setupRow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .bottomHint{font-size:12px;color:#72757b;margin-top:10px}
+    #officePreview{display:none;align-self:stretch;width:100%;padding:16px;overflow:auto;background:#fff;color:#242424}
+    #officePreview table{border-collapse:collapse;font-size:12px;white-space:nowrap}
+    #officePreview td,#officePreview th{border:1px solid #d7dbe0;padding:6px 9px;text-align:left;min-width:35px}
+    #officePreview th{background:#edf0f3;position:sticky;top:0}
+    #officePreview .sheetName{font-weight:700;margin:0 0 10px}
+    #officePreview .docText{font-size:14px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+    #fullViewer{position:fixed;inset:0;z-index:20;background:#f4f5f7;display:none;flex-direction:column}
+    #fullViewer.active{display:flex}
+    .fullTop{min-height:55px;background:#c41621;color:white;display:flex;align-items:center;gap:12px;padding:9px 15px}
+    .fullTitle{font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .fullTop button{background:white;border:0;border-radius:6px;padding:9px 14px;cursor:pointer;color:#9d101b;font-weight:700}
+    #fullFrame{width:100%;flex:1;border:0;background:white;min-height:0}
+    #fullImage{max-width:100%;max-height:calc(100svh - 55px);object-fit:contain;margin:auto;display:none}
+    #fullOffice{padding:25px;overflow:auto;background:white;flex:1;display:none}
+    @media(max-width:700px){.previewTools{gap:4px}.previewTools button{padding:7px 9px}}
+    @media(max-width:820px){.columnStrip{--col-width:220px;flex-basis:min(calc(var(--count,1) * 220px),calc(100% - 290px))}.folderCol{flex-basis:220px;width:220px}.previewHead{align-items:flex-start;flex-direction:column}.previewTools{width:100%}#browserPage{min-height:calc(100svh - 54px)}.columns{height:calc(100svh - 180px)}}
+    @media(max-width:600px){.header .versionTiny{display:none}.columns{display:flex;flex-direction:column;height:calc(100svh - 174px);min-height:510px}.columnStrip{flex:0 0 43%;min-height:0;width:100%;max-width:100%;border-bottom:1px solid #ddd}.folderCol{flex:0 0 78vw;width:78vw}.preview{flex:1;min-height:0}.previewHead{flex-direction:row;flex-wrap:wrap;padding:7px 10px;min-height:39px}.previewTitle{font-size:12px}.previewTools button{padding:5px 8px;font-size:11px}.browserTop h1{font-size:17px}.browserTop{gap:5px}.browserActions{margin-left:0}.header{gap:8px}.header .homeBtn{padding:6px 7px;font-size:12px}.logo{font-size:16px}.brand{font-size:19px}}
+</style></head><body>
+<div class="shell">
+<header class="header"><button class="menu-button" id="openMenu" aria-label="Otevřít nabídku" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M3 5h18M3 12h18M3 19h18"/></svg></button><div class="brand">A-Disk</div><button class="homeBtn" id="homeBtn">⌂ Domů</button><span class="versionTiny">0.1.7 TEST</span><div class="logo">AVANTI</div></header>
+<main class="tilesPage" id="homePage"><div class="tiles" aria-label="Hlavní nabídka">
+      <button class="tile" data-section="akce"><span class="tile-icon"><svg viewBox="0 0 64 64"><path d="M9 29 31 7h22a4 4 0 0 1 4 4v22L35 55a5 5 0 0 1-7 0L9 36a5 5 0 0 1 0-7Z"/><circle cx="45" cy="19" r="4"/><path d="m25 39 13-15M25 27h.01M38 39h.01" stroke-width="3" stroke-linecap="round"/></svg></span><span class="tile-name">Akce</span></button>
+      <button class="tile" data-section="ceniky"><span class="tile-icon"><svg viewBox="0 0 64 64"><ellipse cx="22" cy="21" rx="15" ry="7"/><path d="M7 21v14c0 4 7 8 15 8 4 0 8-1 11-3M7 28c0 4 7 8 15 8"/><ellipse cx="43" cy="13" rx="14" ry="7"/><path d="M29 13v14c0 4 6 7 14 7s14-3 14-7V13M29 20c0 4 6 7 14 7s14-3 14-7"/><path d="M7 35v8c0 4 7 8 15 8s15-4 15-8v-8"/></svg></span><span class="tile-name">Ceníky</span></button>
+      <button class="tile" data-section="technicke"><span class="tile-icon"><svg viewBox="0 0 64 64"><path d="M15 4h25l13 13v39a4 4 0 0 1-4 4H15a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4Z"/><path d="M40 4v14h13"/><rect x="13" y="31" width="44" height="19" rx="3" fill="#bc0014" stroke="white"/></svg></span><span class="tile-name">Technické<br>listy</span></button>
+    </div><p class="note">Testovací verze 0.1.7 · Připojené jsou zatím pouze Ceníky.</p></main>
+<section id="browserPage" aria-label="Prohlížeč Ceníků"><div class="browserTop"><h1>Ceníky</h1><div class="browserActions"><button class="softBtn" id="backBtn">← Zpět</button><button class="softBtn" id="keySettingsBtn">Připojení API</button></div></div>
+<div id="setup"><label for="apiInput">Google Drive API klíč – pouze pro tento test</label><div class="setupRow"><input id="apiInput" type="password" autocomplete="off" spellcheck="false" placeholder="Vložit klíč"><button class="actionBtn" id="saveKey">Použít klíč</button><button class="softBtn" id="deleteKey">Smazat z tohoto zařízení</button></div><p class="help">Klíč se pro pohodlí tohoto testu uloží pouze do tohoto prohlížeče. Na GitHub se neodesílá. Na jiném zařízení jej test zatím nezná; kolegům tuto verzi neposílej. V produkční verzi bude konfigurace vyřešena centrálně.</p></div>
+<div class="columns"><div id="columnStrip" class="columnStrip" aria-label="Sloupce složek"></div><section class="preview" aria-label="Náhled dokumentu"><div class="previewHead"><div class="previewTitle" id="previewTitle">Náhled dokumentu</div><div class="previewTools"><button class="actionBtn" id="openFileBtn" disabled>Otevřít</button><button class="softBtn" id="downloadBtn" disabled>Stáhnout</button><button class="softBtn" id="shareBtn" disabled>Sdílet odkaz</button><button class="softBtn" id="closePreviewBtn" disabled>Zavřít</button></div></div><div class="previewMain"><div id="previewEmpty">Vyber soubor v některém sloupci.<br>PDF nebo obrázek se zobrazí zde.</div><iframe id="previewFrame" title="Náhled PDF" referrerpolicy="no-referrer"></iframe><img id="previewImage" alt="Náhled obrázku"><div id="officePreview" aria-label="Náhled kancelářského dokumentu"></div></div></section></div>
+<div id="statusBar" class="stateBar" role="status" aria-live="polite"></div><div class="bottomHint">Google Disk je jen ke čtení. Náhledy Excelu/Wordu jsou orientační. Otestujte před případným nasazením kolegům.</div></section>
+</div>
+<div class="overlay" id="overlay"></div>
+<div id="fullViewer" role="dialog" aria-modal="true" aria-label="Otevřený dokument"><div class="fullTop"><div id="fullTitle" class="fullTitle"></div><button id="exitFull">✕ Zavřít</button></div><iframe id="fullFrame" title="Otevřený dokument" referrerpolicy="no-referrer"></iframe><img id="fullImage" alt="Otevřený obrázek"><div id="fullOffice"></div></div><nav class="drawer" id="drawer" aria-label="Postranní nabídka"><h2>A-DISK</h2><button id="goHome">Úvodní obrazovka</button><button id="about">O aplikaci</button><span class="version">0.1.7 · TEST</span></nav>
+<dialog id="infoDialog"><div class="dialog-header" id="dialogTitle">A-DISK</div><div class="dialog-body" id="dialogText"></div><div class="dialog-actions"><button class="btn secondary" id="closeDialog">Zavřít</button></div></dialog>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const ROOT='1Q1-CKkkWnJfGFJIravbmiayyvP4EenPx';
+// V testu záměrně není zveřejněn žádný API klíč.
+const CONFIG={version:'0.1.7',apiKey:'',root:ROOT};
+let key=CONFIG.apiKey||localStorage.getItem('adisk_test_key')||'';
+let path=[{id:ROOT,name:'Ceníky'}],itemsByCol=[],selectedIds=[],selectedFile=null,objectUrl='',loadToken=0,pdfToken=0,selectedMime='';
+const menu=$('drawer'),backdrop=$('overlay'),menuBtn=$('openMenu');
+function setMenu(open){menu.classList.toggle('active',open);backdrop.classList.toggle('active',open);menuBtn.setAttribute('aria-expanded',String(open));}
+function message(s,isError=false){$('statusBar').textContent=s;$('statusBar').classList.toggle('error',isError);}
+function showDialog(title,text){$('dialogTitle').textContent=title;$('dialogText').replaceChildren();const p=document.createElement('p');p.textContent=text;$('dialogText').append(p);$('infoDialog').showModal();}
+function clearPreview(){closeFull();pdfToken++;if(objectUrl)URL.revokeObjectURL(objectUrl);objectUrl='';$('previewFrame').removeAttribute('src');$('previewImage').removeAttribute('src');$('previewFrame').style.display='none';$('previewImage').style.display='none';$('officePreview').style.display='none';$('officePreview').replaceChildren();$('previewEmpty').style.display='block';$('previewEmpty').textContent='Vyber soubor v některém sloupci.';$('previewTitle').textContent='Náhled dokumentu';$('openFileBtn').disabled=true;$('downloadBtn').disabled=true;$('shareBtn').disabled=true;$('closePreviewBtn').disabled=true;selectedFile=null;}
+function home(){loadToken++;clearPreview();$('browserPage').style.display='none';$('homePage').style.display='block';$('homeBtn').classList.remove('visible');setMenu(false);}
+function browser(){setMenu(false);$('homePage').style.display='none';$('browserPage').style.display='block';$('homeBtn').classList.add('visible');path=[{id:ROOT,name:'Ceníky'}];selectedIds=[];itemsByCol=[];clearPreview();$('columnStrip').replaceChildren();if(!key){showSetup(true);message('Pro technický test vlož API klíč.');}else{showSetup(false);loadFolder(0);}}
+function showSetup(show){$('setup').classList.toggle('show',show);if(show)$('apiInput').value=key;}
+function safeUrl(f){return f.webViewLink||(f.mimeType==='application/vnd.google-apps.folder'?`https://drive.google.com/drive/folders/${encodeURIComponent(f.id)}`:`https://drive.google.com/file/d/${encodeURIComponent(f.id)}/view`);}
+async function driveList(id){let arr=[],page='';do{const u=new URL('https://www.googleapis.com/drive/v3/files');u.searchParams.set('q',`'${id}' in parents and trashed = false`);u.searchParams.set('fields','nextPageToken,files(id,name,mimeType,webViewLink,size,resourceKey)');u.searchParams.set('pageSize','100');u.searchParams.set('orderBy','folder,name');u.searchParams.set('key',key);if(page)u.searchParams.set('pageToken',page);const r=await fetch(u,{cache:'no-store'});const data=await r.json();if(!r.ok)throw Error(`${data.error?.status||r.status}: ${data.error?.message||'Nepodařilo se načíst složku.'}`);arr.push(...(data.files||[]));page=data.nextPageToken||'';}while(page&&arr.length<5000);return arr.sort((a,b)=>Number(b.mimeType==='application/vnd.google-apps.folder')-Number(a.mimeType==='application/vnd.google-apps.folder')||a.name.localeCompare(b.name,'cs'));}
+async function loadFolder(level){const token=++loadToken,folder=path[level];path=path.slice(0,level+1);itemsByCol=itemsByCol.slice(0,level);selectedIds=selectedIds.slice(0,level);clearPreview();renderColumns();message('Načítám složku '+folder.name+'…');try{const files=await driveList(folder.id);if(token!==loadToken)return;itemsByCol[level]=files;renderColumns();message('Načteno: '+folder.name+' · '+files.length+' položek.');const strip=$('columnStrip');strip.scrollLeft=strip.scrollWidth;}catch(e){if(token!==loadToken)return;message('Chyba: '+e.message,true);renderColumns('Nepodařilo se načíst obsah.');}}
+function renderColumns(err=''){const strip=$('columnStrip');strip.style.setProperty('--count',String(path.length));strip.replaceChildren();for(let level=0;level<path.length;level++){const folder=path[level],col=document.createElement('section');col.className='folderCol';const title=document.createElement('div');title.className='colHead';title.textContent=folder.name;title.title=folder.name;col.append(title);const body=document.createElement('div');body.className='colItems';const files=itemsByCol[level];if(!files){const t=document.createElement('div');t.style.padding='14px';t.style.fontSize='12px';t.style.color='#888';t.textContent=err||'Načítání…';body.append(t);}else if(files.length===0){const t=document.createElement('div');t.style.padding='14px';t.textContent='Prázdná složka';body.append(t);}else{for(const f of files){const b=document.createElement('button');b.className='entry'+(selectedIds[level]===f.id?' selected':'');const isFolder=f.mimeType==='application/vnd.google-apps.folder';const ic=document.createElement('span');ic.className='entryIcon';ic.textContent=isFolder?'📁':f.mimeType==='application/pdf'?'📄':f.mimeType.startsWith('image/')?'🖼️':'📃';const name=document.createElement('span');name.className='entryName';name.textContent=f.name;b.title=f.name;b.append(ic,name);if(isFolder){const arrow=document.createElement('span');arrow.className='entryChevron';arrow.textContent='›';b.append(arrow);}b.addEventListener('click',()=>{selectedIds=selectedIds.slice(0,level);selectedIds[level]=f.id;if(isFolder){path=path.slice(0,level+1);path.push({id:f.id,name:f.name});loadFolder(level+1);}else{path=path.slice(0,level+1);itemsByCol=itemsByCol.slice(0,level+1);loadToken++;renderColumns();preview(f);}});body.append(b);}}col.append(body);strip.append(col);}}
+// Načte knihovnu až ve chvíli, kdy je opravdu potřeba kancelářský náhled.
+const libs={};
+function loadLibrary(name,url,globalName){
+  if(window[globalName])return Promise.resolve(window[globalName]);
+  if(!libs[name])libs[name]=new Promise((resolve,reject)=>{
+    const script=document.createElement('script');script.src=url;script.async=true;
+    script.onload=()=>window[globalName]?resolve(window[globalName]):reject(Error('Knihovna náhledu není dostupná.'));
+    script.onerror=()=>reject(Error('Nepodařilo se načíst knihovnu náhledu.'));
+    document.head.append(script);
+  });
+  return libs[name];
+}
+function sheetPreview(blob, token){return blob.arrayBuffer().then(async data=>{
+  const XLSX=await loadLibrary('xlsx','https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js','XLSX');
+  if(token!==pdfToken)return;
+  const book=XLSX.read(data,{type:'array'}),name=book.SheetNames[0];
+  const rows=XLSX.utils.sheet_to_json(book.Sheets[name],{header:1,defval:'',raw:false,blankrows:false}).slice(0,35);
+  const host=$('officePreview');host.replaceChildren();
+  const title=document.createElement('div');title.className='sheetName';title.textContent='List: '+name+' · orientační náhled prvních 35 řádků';host.append(title);
+  const table=document.createElement('table');
+  for(const row of rows){const tr=document.createElement('tr');for(const value of row.slice(0,14)){const td=document.createElement('td');td.textContent=String(value??'');tr.append(td)}table.append(tr)}
+  host.append(table);host.style.display='block';
+  return 'Zobrazen orientační náhled tabulky.';
+})}
+function wordPreview(blob,token){return blob.arrayBuffer().then(async data=>{
+  const mammoth=await loadLibrary('mammoth','https://cdn.jsdelivr.net/npm/mammoth@1.9.0/mammoth.browser.min.js','mammoth');
+  if(token!==pdfToken)return;
+  const result=await mammoth.extractRawText({arrayBuffer:data});if(token!==pdfToken)return;
+  const host=$('officePreview');host.replaceChildren();
+  const title=document.createElement('div');title.className='sheetName';title.textContent='Orientační náhled začátku dokumentu';
+  const text=document.createElement('div');text.className='docText';text.textContent=result.value.slice(0,7000)||( 'Dokument neobsahuje čitelný text.');host.append(title,text);host.style.display='block';
+  return 'Zobrazen začátek dokumentu.';
+})}
+async function preview(f){
+  clearPreview();selectedFile=f;selectedMime=f.mimeType||'';
+  const token=pdfToken;
+  $('previewTitle').textContent=f.name;$('shareBtn').disabled=false;
+  $('openFileBtn').disabled=false;$('closePreviewBtn').disabled=false;
+  $('previewEmpty').textContent='Načítám náhled…';message('Načítám '+f.name+'…');
+  const isPdf=f.mimeType==='application/pdf',isImage=f.mimeType.startsWith('image/');
+  const isExcel=/\.(xls|xlsx)$/i.test(f.name),isWord=/\.docx$/i.test(f.name);
+  if(!isPdf&&!isImage&&!isExcel&&!isWord){
+    $('previewEmpty').textContent='U tohoto typu souboru není jednoduchý náhled. Tlačítkem Otevřít zobrazíš originál na Google Disku.';
+    message('Soubor vybrán: '+f.name);return;
+  }
+  try{
+    const u=new URL('https://www.googleapis.com/drive/v3/files/'+encodeURIComponent(f.id));
+    u.searchParams.set('alt','media');u.searchParams.set('key',key);
+    const headers={};if(f.resourceKey)headers['X-Goog-Drive-Resource-Keys']=f.id+'/'+f.resourceKey;
+    const response=await fetch(u,{headers,cache:'no-store'});
+    if(!response.ok){let d={};try{d=await response.json()}catch{}
+      throw Error(`${d.error?.status||response.status}: ${d.error?.message||'Soubor není dostupný.'}`)}
+    const blob=await response.blob();if(token!==pdfToken)return;
+    if(isPdf){const h=await blob.slice(0,5).text();if(h!=='%PDF-')throw Error('Odpověď není platný PDF soubor.');}
+    // Safari vyžaduje správný MIME typ; vracíme funkční postup z 0.1.5.
+    objectUrl=URL.createObjectURL(new Blob([blob], {type: isPdf ? 'application/pdf' : (isImage ? f.mimeType : (blob.type || 'application/octet-stream'))}));
+    if(isPdf){$('previewFrame').style.display='block';$('previewFrame').src=objectUrl+'#toolbar=1';}
+    else if(isImage){$('previewImage').style.display='block';$('previewImage').src=objectUrl;}
+    else if(isExcel){await sheetPreview(blob,token);}
+    else if(isWord){await wordPreview(blob,token);}
+    if(token!==pdfToken)return;
+    $('previewEmpty').style.display='none';$('downloadBtn').disabled=false;
+    message('Zobrazeno: '+f.name+' ('+(blob.size/1048576).toFixed(2)+' MB).');
+  }catch(e){if(token!==pdfToken)return;
+    $('previewEmpty').style.display='block';$('previewEmpty').textContent='Náhled se nepodařilo načíst: '+e.message+'; dokument lze otevřít na Disku.';
+    $('officePreview').style.display='none';$('previewFrame').style.display='none';$('previewImage').style.display='none';if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl='';}message('Náhled: '+e.message,true);
+  }
+}
+function closeFull(){const viewer=$('fullViewer');if(!viewer.classList.contains('active'))return;
+  viewer.classList.remove('active');$('fullFrame').removeAttribute('src');$('fullImage').removeAttribute('src');
+  $('fullImage').style.display='none';$('fullFrame').style.display='none';$('fullOffice').style.display='none';$('fullOffice').replaceChildren();}
+function openFull(){if(!selectedFile)return;
+  const isPdf=selectedMime==='application/pdf',isImage=selectedMime.startsWith('image/');
+  if(!objectUrl||(!isPdf&&!isImage)){window.open(safeUrl(selectedFile),'_blank','noopener,noreferrer');return;}
+  const viewer=$('fullViewer');$('fullTitle').textContent=selectedFile.name;
+  $('fullFrame').style.display=isPdf?'block':'none';$('fullImage').style.display=isImage?'block':'none';
+  if(isPdf)$('fullFrame').src=objectUrl+'#toolbar=1';if(isImage)$('fullImage').src=objectUrl;
+  viewer.classList.add('active');$('exitFull').focus();}
+$('openFileBtn').onclick=openFull;
+$('exitFull').onclick=closeFull;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeFull()});
+$('downloadBtn').onclick=()=>{if(!objectUrl||!selectedFile)return;
+  const a=document.createElement('a');a.href=objectUrl;a.download=selectedFile.name;document.body.append(a);a.click();a.remove();};
+$('shareBtn').onclick=async()=>{if(!selectedFile)return;const url=safeUrl(selectedFile);try{if(navigator.share)await navigator.share({title:selectedFile.name,url});else{await navigator.clipboard.writeText(url);message('Odkaz zkopírován do schránky.');}}catch(e){if(e.name!=='AbortError')showDialog('Odkaz k dokumentu',url);}};
+$('closePreviewBtn').onclick=()=>{clearPreview();selectedIds.pop();renderColumns();};
+$('saveKey').onclick=()=>{const v=$('apiInput').value.trim();if(!v){message('Vlož API klíč.',true);return;}key=v;try{localStorage.setItem('adisk_test_key',key);}catch{}showSetup(false);path=[{id:ROOT,name:'Ceníky'}];loadFolder(0);};
+$('deleteKey').onclick=()=>{key='';try{localStorage.removeItem('adisk_test_key');}catch{}$('apiInput').value='';clearPreview();$('columnStrip').replaceChildren();message('Klíč odstraněn z tohoto prohlížeče.');};
+$('keySettingsBtn').onclick=()=>showSetup(!$('setup').classList.contains('show'));
+$('backBtn').onclick=()=>{if(path.length>1)loadFolder(path.length-2);else home();};
+$('homeBtn').onclick=home;
+$('openMenu').onclick=()=>setMenu(!menu.classList.contains('active'));backdrop.onclick=()=>setMenu(false);$('goHome').onclick=home;
+$('about').onclick=()=>{setMenu(false);showDialog('O aplikaci','A-DISK 0.1.7 – testovací verze. Ceníky se načítají z veřejně sdíleného Google Disku. Neumožňuje úpravy souborů.');};
+$('closeDialog').onclick=()=>$('infoDialog').close();
+document.querySelectorAll('[data-section]').forEach(button=>button.addEventListener('click',()=>{if(button.dataset.section==='ceniky'){browser();}else{showDialog(button.textContent.trim(),'Tato sekce zatím není připojena. V testovací verzi fungují pouze Ceníky.');}}));
+window.addEventListener('pagehide',()=>{if(objectUrl)URL.revokeObjectURL(objectUrl)});
+</script></body></html>
