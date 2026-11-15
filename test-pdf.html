@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="strict-origin-when-cross-origin"><title>A-DISK – test PDF 0.1.4</title>
+<style>
+:root{--red:#c41621;--dark:#303238;--line:#d9dce1}*{box-sizing:border-box}body{margin:0;background:#f4f5f7;color:var(--dark);font:16px Arial,Helvetica,sans-serif}header{background:var(--red);height:60px;color:#fff;font-size:23px;font-weight:bold;display:flex;align-items:center;gap:14px;padding:0 24px}header small{margin-left:auto;font-size:12px;font-weight:normal}main{max-width:1200px;margin:0 auto;padding:24px 18px 65px}h1{font-size:23px;margin:0 0 8px}p{line-height:1.5}.panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0;box-shadow:0 2px 6px #0001}label{display:block;font-weight:bold;margin:13px 0 7px}input{width:100%;font:inherit;padding:11px;border:1px solid #b9bdc5;border-radius:7px}button,a.button{font:inherit;border:0;border-radius:7px;padding:12px 15px;background:var(--red);color:#fff;cursor:pointer;text-decoration:none;display:inline-block}button.secondary,a.button.secondary{background:#e9edf1;color:#25272d;border:1px solid #cbd0d8}.buttons{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.muted{font-size:13px;color:#65676c}.alert{padding:13px;background:#fff4e9;border-left:4px solid #cb7c12;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:12px}.ok{background:#e9f7ef;border-left-color:#238a4a}.hidden{display:none!important}.viewer{width:100%;height:75vh;min-height:430px;border:1px solid #d5d8de;border-radius:5px;background:#fafafa}#status{white-space:pre-wrap}code{overflow-wrap:anywhere}@media(max-width:600px){header{padding:0 14px}main{padding:16px 10px}.panel{padding:14px}.viewer{height:68vh;min-height:340px}}
+</style></head><body>
+<header>A-Disk <small>TECHNICKÝ TEST 0.1.4 – PDF</small></header>
+<main><h1>PDF přímo v okně A-DISKU</h1><p>Samostatný test otevření existujícího veřejně sdíleného PDF bez přihlášení. Schválená verze A-DISK 0.1.1 se nemění.</p>
+<section class="panel"><strong>Jednorázový test</strong><p class="muted">API klíč zůstane jen v paměti této stránky; nebude uložen do GitHubu ani do trvalého úložiště prohlížeče. Testuj pouze na adrese <code>borkovecp.github.io/a-disk/test-pdf.html</code>.</p>
+<label for="key">Google Drive API klíč</label><input id="key" type="password" autocomplete="off" spellcheck="false" placeholder="Vlož API klíč">
+<label for="fileId">ID PDF dokumentu</label><input id="fileId" type="text" spellcheck="false" value="1R3SIDY_D6BnEqVIkA7W-C_-KmXmk8cE1"><p class="muted">Předvybrán skutečný dokument „2tec2 VOC CZ.pdf“ ze složky Ceníky; ID není přihlašovací údaj.</p>
+<div class="buttons"><button id="run">Otevřít PDF uvnitř A-DISKU</button><button id="clear" class="secondary">Vymazat klíč</button><a class="button secondary" href="./">Zpět na A-DISK</a></div></section>
+<section class="panel"><strong>Výsledek testu</strong><p id="status" role="status">Zatím netestováno.</p><div id="error" class="alert hidden" role="alert"></div></section>
+<section id="viewPanel" class="panel hidden"><strong id="filename">Náhled dokumentu</strong><p class="muted" id="viewInfo">Soubor se načítá přímo z Google Drive API.</p><iframe id="viewer" class="viewer" title="Náhled PDF" referrerpolicy="no-referrer"></iframe><div class="buttons"><button id="close" class="secondary">Zavřít náhled</button></div></section>
+<p class="muted">Test provádí pouze čtení pomocí Google Drive API <code>files.get?alt=media</code>. Neumožňuje upravovat soubory. Pokud Google nedovolí načíst obsah souboru anonymně nebo prohlížeč zablokuje přístup, zobrazí konkrétní chybu. Do Google přihlášení nepřesměrovává.</p></main>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+let objectUrl='';
+function status(text){$('status').textContent=text;}
+function hideError(){$('error').classList.add('hidden');$('error').textContent='';}
+function showError(message){$('error').textContent=message;$('error').classList.remove('hidden');}
+function clearViewer(){if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl='';}$('viewer').removeAttribute('src');$('viewPanel').classList.add('hidden');}
+async function fetchPdf(){
+ hideError();clearViewer();const key=$('key').value.trim(),id=$('fileId').value.trim();
+ if(!key){showError('Nejdřív vlož API klíč.');return;}
+ if(!/^[\w-]{10,}$/.test(id)){showError('Zkontroluj ID PDF dokumentu.');return;}
+ $('run').disabled=true;status('Načítám PDF ze sdíleného Google Disku bez přihlášení…');
+ try{
+  const url=new URL('https://www.googleapis.com/drive/v3/files/'+encodeURIComponent(id));
+  url.searchParams.set('alt','media');url.searchParams.set('key',key);url.searchParams.set('supportsAllDrives','true');
+  const response=await fetch(url.toString(),{method:'GET',cache:'no-store'});
+  if(!response.ok){let detail='';try{const body=await response.json();detail=(body.error?.status?body.error.status+': ':'')+(body.error?.message||'');}catch{detail=await response.text().catch(()=>'');}throw new Error('Google Drive API: HTTP '+response.status+'\n'+(detail||'Nepodařilo se stáhnout obsah PDF.'));}
+  const bytes=await response.arrayBuffer();
+  const first=String.fromCharCode(...new Uint8Array(bytes.slice(0,5)));
+  if(first!=='%PDF-')throw new Error('Google vrátil data, ale nezačínají hlavičkou PDF (%PDF-). Odpověď proto nezobrazím jako dokument.');
+  const blob=new Blob([bytes],{type:'application/pdf'});
+  objectUrl=URL.createObjectURL(blob);
+  $('filename').textContent='Náhled PDF – 2tec2 VOC CZ.pdf';
+  $('viewInfo').textContent='PDF načteno přímo přes Google Drive API ('+(bytes.byteLength/1024/1024).toFixed(2).replace('.',',')+' MB). Zůstáváš v A-DISKU.';
+  $('viewer').src=objectUrl+'#toolbar=1';$('viewPanel').classList.remove('hidden');
+  status('HOTOVO: Google Drive API vrátilo celý PDF soubor bez přihlášení. Zobrazil se náhled níže.');
+ }catch(e){let message=e.message||String(e);if(e instanceof TypeError)message='Síťový požadavek se nepodařil (může jít o CORS, síť nebo omezení klíče): '+message;if(/404|not found/i.test(message))message+='\n\nOvěř sdílení konkrétního PDF: „Kdokoli s odkazem – Čtenář“.';showError(message);status('Test načtení PDF neprošel.');}
+ finally{$('run').disabled=false;}
+}
+$('run').addEventListener('click',fetchPdf);
+$('clear').addEventListener('click',()=>{$('key').value='';clearViewer();hideError();status('API klíč odstraněn z formuláře.');});
+$('close').addEventListener('click',clearViewer);
+window.addEventListener('pagehide',clearViewer);
+</script></body></html>
